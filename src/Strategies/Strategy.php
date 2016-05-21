@@ -49,23 +49,16 @@ abstract class Strategy implements StrategyInterface
         // Generate a unique ID based on the actor and event
         $id = $this->generateIdentifier($actor, $event);
 
-        // Add the event to the repository
-        $this->repository->add($id, $event);
+        // Garbage collect any old events
+        $this->repository->clear($id, $this->getSince($id));
 
-        // Get all matching events between two timestamps
-        $events = $this->repository->between(
-            $id,
-            $after = $this->getAfter($id),
-            $before = $this->getBefore($id)
-        );
-
-        // If the rate limit is exceeded then throw an exception
-        if (count($events) > $this->getAllow()) {
+         // Check if one more would exceed the limit
+        if ($this->repository->count($id) + 1 > $this->getAllow()) {
             throw new RateLimitExceededException('Rate limit exceeded');
         }
 
-        // Garbage collect any old events
-        $this->repository->removeBefore($id, $this->getTrashBefore($after, $before));
+        // Add the new event to the repository
+        $this->repository->add($id, $event);
     }
 
     /**
@@ -125,6 +118,6 @@ abstract class Strategy implements StrategyInterface
      */
     protected function generateIdentifier(ActorInterface $actor, EventInterface $event)
     {
-        return md5($actor->getIdentifier() . ':' . $event->getIdentifier());
+        return md5($actor->getActorId() . ':' . $event->getEventId());
     }
 }

@@ -5,14 +5,26 @@ namespace Armory\Rate\Repositories;
 use Armory\Rate\Contracts\EventInterface;
 use Armory\Rate\Contracts\RepositoryInterface;
 use Closure;
+use Predis\ClientInterface;
 
-class MemoryRepository implements RepositoryInterface
+class RedisRepository implements RepositoryInterface
 {
     /**
-     * Stores the events that have happened
-     * @var array
+     * The Redis instance
+     * @var
      */
-    protected $events = [];
+    protected $redis;
+
+    /**
+     * Create a new Redis repository
+     *
+     * @param Predis\ClientInterface $client
+     * @return void
+     */
+    public function __construct(ClientInterface $client)
+    {
+        $this->redis = $client;
+    }
 
     /**
      * Finds all events that match
@@ -21,9 +33,7 @@ class MemoryRepository implements RepositoryInterface
      */
     public function find($id)
     {
-        $events = isset($this->events[$id]) ? $this->events[$id] : [];
-        sort($events);
-        return $events;
+        return array_map('intval', array_values($this->redis->zrange($id, 0, -1, 'WITHSCORES')));
     }
 
     /**
@@ -33,7 +43,7 @@ class MemoryRepository implements RepositoryInterface
      */
     public function count($id)
     {
-        return count($this->find($id));
+        return $this->redis->zcard($id);
     }
 
     /**
@@ -44,17 +54,14 @@ class MemoryRepository implements RepositoryInterface
      */
     public function add($id, EventInterface $event)
     {
-        // Get existing events that have happened
-        $existing = $this->find($id);
+        $member = uniqid();
+        $score = $event->getTimestamp();
 
-        // Add the event by timestamp a number of times based on
-        // the cost of the event
         for ($i = 0; $i < $event->getCost(); $i++) {
-            $existing[] = $event->getTimestamp();
+            $this->redis->zadd($id, [
+                $member => $score
+            ]);
         }
-
-        // Update the events
-        $this->events[$id] = $existing;
     }
 
     /**
@@ -64,8 +71,8 @@ class MemoryRepository implements RepositoryInterface
      */
     public function first($id)
     {
-        $events = $this->find($id);
-        return reset($events);
+        $first = array_values($this->redis->zrange($id, 0, 0, 'WITHSCORES'));
+        return reset($first);
     }
 
     /**
@@ -76,11 +83,6 @@ class MemoryRepository implements RepositoryInterface
      */
     public function clear($id, int $min)
     {
-        $events = array_filter($this->find($id), function($timestamp) use ($min)
-        {
-            return $timestamp > $min;
-        });
-
-        $this->events[$id] = $events;
+        $this->redis->zremrangebyscore($id, "-inf", "($min");
     }
 }

@@ -167,8 +167,8 @@ class Rate implements RateInterface
      * Gets the number of remaining attempts available
      * @return int
      */
-    public function remaining()
+    public function remaining(ActorInterface $actor, EventInterface $event)
     {
-        return $this->getStrategy()->getRemaining($this->event);
+        return $this->getStrategy()->getRemaining($actor, $event);
     }
 }

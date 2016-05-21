@@ -52,24 +52,9 @@ interface StrategyInterface
     public function getTimeframe();
 
     /**
-     * Gets the timestamp before which events are counted for rate limiting
-     * @param string $id
-     * @return int
-     */
-    public function getBefore($id);
-
-    /**
      * Gets the timestamp after which events are counted for rate limiting
      * @param string $id
      * @return int
      */
-    public function getAfter($id);
-
-    /**
-     * Gets the timestamp before which events should be garbage collected
-     * @param int $after
-     * @param int $before
-     * @return int
-     */
-    public function getTrashBefore($after, $before);
+    public function getSince($id);
 }

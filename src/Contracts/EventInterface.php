@@ -21,14 +21,14 @@ interface EventInterface
      * Gets the unique rate identifier of this event
      * @return string
      */
-    public function getIdentifier();
+    public function getEventId();
 
     /**
      * Sets the unique rate identifier for this event
      * @param string $identifier
      * @return void
      */
-    public function setIdentifier($identifier);
+    public function setEventId($identifier);
 
     /**
      * Gets the timestamp when the event was fired

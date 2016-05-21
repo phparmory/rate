@@ -5,12 +5,6 @@ namespace Armory\Rate\Contracts;
 interface RepositoryInterface
 {
     /**
-     * Gets the whole repository
-     * @return array
-     */
-    public function all();
-
-    /**
      * Gets all matching events
      * @return array
      */
@@ -32,15 +26,6 @@ interface RepositoryInterface
     public function add($id, EventInterface $event);
 
     /**
-     * Finds the events that happened between a min and max timestamp
-     * @param string $id
-     * @param int $min
-     * @param int $max
-     * @return array
-     */
-    public function between($id, int $min, int $max);
-
-    /**
      * Finds the first occuring matching event
      * @param string $id
      * @return void
@@ -48,10 +33,10 @@ interface RepositoryInterface
     public function first($id);
 
     /**
-     * Remove all events that happen before a min timestamp
+     * Clear all events that happen before a min timestamp
      * @param string $id
      * @param int $min
      * @return void
      */
-    public function removeBefore($id, int $min);
+    public function clear($id, int $min);
 }

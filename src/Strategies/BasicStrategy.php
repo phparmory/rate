@@ -2,8 +2,6 @@
 
 namespace Armory\Rate\Strategies;
 
-use Armory\Rate\Contracts\EventInterface;
-
 /**
  * The basic strategy specifies a rate limit within a fixed time
  * frame i.e. allow X events every Y minutes.
@@ -11,33 +9,14 @@ use Armory\Rate\Contracts\EventInterface;
 class BasicStrategy extends Strategy
 {
     /**
-     * Gets the timestamp before which events are counted for rate limiting
-     * @param string $id
+     * Gets the timestamp after which events should be considered for rate limiting
+     * @param int $id
      * @return int
      */
-    public function getBefore($id)
+    public function getSince($id)
     {
-        return $this->getAfter($id) + $this->getTimeframe() + 1;
-    }
-
-    /**
-     * Gets the timestamp after which events are counted for rate limiting
-     * @param string $id
-     * @return int
-     */
-    public function getAfter($id)
-    {
-        return $this->repository->first($id) - 1;
-    }
-
-    /**
-     * Gets the timestamp before which events should be garbage collected
-     * @param int $after
-     * @param int $before
-     * @return int
-     */
-    public function getTrashBefore($after, $before)
-    {
-        return time() > $before ? $before : $after;
+        $min = $this->repository->first($id) - 1;
+        $max = $min + $this->getTimeframe() + 1;
+        return time() > $max ? $max : $min;
     }
 }

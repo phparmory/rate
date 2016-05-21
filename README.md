@@ -6,31 +6,52 @@ Rate limiter implementation
 Actors are an abstract class that are able to fire events:
 
 ```php
-use Armory\Rate\Actors\Actor;
+use Armory\Rate\Contracts\ActorInterface;
+use Armory\Rate\Traits\RateLimitActor;
 
-class TestActor extends Actor
+class User implements ActorInterface
 {
-    protected $id = 1;
+    use RateLimitActor;
+
+    protected $actorId = 1;
 }
 ```
 
 ### Events
 
-Events are the class that get rate limited:
+Events are classes that can be rate limited:
 
 ```php
-use Armory\Rate\Events\Event;
+use Armory\Rate\Contracts\EventInterface;
+use Armory\Rate\Traits\RateLimitEvent;
 
-class TestEvent extends Event
+class RequestsApi implements EventInterface
 {
-    protected $id = 1;
+    use RateLimitEvent;
+
+    protected $eventId = 1;
 }
 ```
 
 ### Repositories
 
-Repositories can allow for events to be persisted across requests when they're fired. Rate comes with
-an in-memory repository that gets you started.
+Repositories store collections of events that have been fired. The MemoryRepository
+is a good place to start:
+
+```php
+use Armory\Rate\Repositories\MemoryRepository;
+
+$repository = new MemoryRepository;
+$user = new User;
+$request = new RequestsApi;
+
+// Form a unique ID with the actorId and eventId
+$id = $user->getUserId() . ':' . $request->getEventId();
+
+$repository->add($id, $request);
+
+echo $repository->count($id); // 1
+```
 
 ### Strategies
 
@@ -38,12 +59,6 @@ A strategy determines how rate limiting is performed. The two main strategies ar
 
 - BasicStrategy e.g. 60 requests every hour
 - DynamicStrategy (leaky bucket) e.g. 60 requests within an hour
-
-With the basic strategy if 60 requests are performed in the first minute, you would
-have to wait 59 minutes until the hour is up before firing another event.
-
-With the dynamic strategy if 60 requests are performed in the first minute, you would
-be able to fire another event in 1 minute.
 
 ```php
 use Armory\Rate\Strategies\BasicStrategy;
@@ -53,11 +68,11 @@ $strategy = new BasicStrategy(new MemoryRepository);
 $strategy->setAllow(1); // 1 request
 $strategy->setTimeframe(1); // every second
 
-$actor = new TestActor;
-$event = new TestEvent;
+$user = new User;
+$request = new RequestApi;
 
-$strategy->handle($actor, $event); // Works
-$strategy->handle($actor, $event); // Throws RateLimitExceededException
+$strategy->handle($user, $request); // Works
+$strategy->handle($user, $request); // Throws RateLimitExceededException
 ```
 
 ### Rate limiters
@@ -72,6 +87,64 @@ $rate = new Rate()->dynamic()->allow(2)->seconds(3);
 
 $rate->handle(new TestEvent)->as($actor);
 $rate->handle(new TestEvent)->as($actor);
-$rate->handle(new TestEvent)->as($actor);
+$rate->handle(new TestEvent)->as($actor); // Throws RateLimitExceededException
 ```
 
+### Costs
+
+If you have multiple events that need rate limiting then one approach would be to
+create new rate limiters for each endpoint like so:
+
+```php
+class RequestsUserApi implements EventInterface
+{
+    use RateLimitEvent;
+
+    protected $eventId = 1;
+}
+
+class RequestsPostsApi implements EventInterface
+{
+    use RateLimitEvent;
+
+    protected $eventId = 2;
+}
+
+$userApi = new Rate;
+$userApi->allow(100)->hour(1); // Allow 100 requests to the user api an hour
+
+$postsApi = new Rate;
+$postsApi->allow(50)->hour(1); // Allow 50 requests to the posts api an hour
+```
+
+This would allow the user a total of 150 requests per hour, 100 for the user api
+and 50 for the posts api. Another way to handle it is using costs:
+
+```php
+class RequestsUserApi implements EventInterface
+{
+    use RateLimitEvent;
+
+    protected $eventId = 1;
+
+    protected $cost = 1;
+}
+
+class RequestsPostsApi implements EventInterface
+{
+    use RateLimitEvent;
+
+    protected $eventId = 2;
+
+    protected $cost = 2;
+}
+
+$api = new Rate;
+$api->allow(200)->hour(1); // User has 200 api credits per hour
+```
+
+In this case the user has 200 api credits to use. They could do:
+
+- 200 requests to the user api or
+- 100 requests to the posts api or
+- 100 requests so the user api and 50 to the posts api

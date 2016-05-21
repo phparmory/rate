@@ -2,8 +2,6 @@
 
 namespace Armory\Rate\Strategies;
 
-use Armory\Rate\Contracts\EventInterface;
-
 /**
  * The dynamic strategy implements a leaky bucket rate limiter i.e.
  * allow X events within Y minutes.
@@ -11,33 +9,12 @@ use Armory\Rate\Contracts\EventInterface;
 class DynamicStrategy extends Strategy
 {
     /**
-     * Gets the timestamp before which events are counted for rate limiting
-     * @param string $id
+     * Gets the timestamp after which events should be considered for rate limiting
+     * @param int $id
      * @return int
      */
-    public function getBefore($id)
-    {
-        return time() + 1;
-    }
-
-    /**
-     * Gets the timestamp after which events are counted for rate limiting
-     * @param string $id
-     * @return int
-     */
-    public function getAfter($id)
+    public function getSince($id)
     {
         return time() - $this->getTimeframe();
-    }
-
-    /**
-     * Gets the timestamp before which events should be garbage collected
-     * @param int $after
-     * @param int $before
-     * @return int
-     */
-    public function getTrashBefore($after, $before)
-    {
-        return $after;
     }
 }
