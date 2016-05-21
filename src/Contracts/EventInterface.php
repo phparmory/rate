@@ -5,6 +5,13 @@ namespace Armory\Rate\Contracts;
 interface EventInterface
 {
     /**
+     * Creates a new event
+     * @param string $id
+     * @return void
+     */
+    public function __construct($id);
+
+    /**
      * Gets the cost of an event
      * @return int
      */

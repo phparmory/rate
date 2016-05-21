@@ -3,7 +3,7 @@
 namespace Armory\Rate\Tests;
 
 use Armory\Rate\Repositories\MemoryRepository;
-use Armory\Rate\Tests\Stubs\TestEvent;
+use Armory\Rate\Events\Event;
 use PHPUnit_Framework_TestCase;
 
 class MemoryRepositoryTest extends PHPUnit_Framework_TestCase
@@ -11,7 +11,7 @@ class MemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testFind()
     {
         $repository = new MemoryRepository;
-        $event = new TestEvent;
+        $event = new Event;
 
         $repository->add($event->getEventId(), $event);
 
@@ -24,7 +24,7 @@ class MemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testCount()
     {
         $repository = new MemoryRepository;
-        $event = new TestEvent;
+        $event = new Event;
 
         $repository->add($event->getEventId(), $event);
 
@@ -34,7 +34,7 @@ class MemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testFirst()
     {
         $repository = new MemoryRepository;
-        $event = new TestEvent;
+        $event = new Event;
         $id = $event->getEventId();
 
         // Add the first
@@ -59,7 +59,7 @@ class MemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testClear()
     {
         $repository = new MemoryRepository;
-        $event = new TestEvent;
+        $event = new Event;
         $id = $event->getEventId();
 
         // Add the first

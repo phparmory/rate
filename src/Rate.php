@@ -2,11 +2,13 @@
 
 namespace Armory\Rate;
 
+use Armory\Rate\Actors\Actor;
 use Armory\Rate\Contracts\ActorInterface;
 use Armory\Rate\Contracts\EventInterface;
 use Armory\Rate\Contracts\RateInterface;
 use Armory\Rate\Contracts\RepositoryInterface;
 use Armory\Rate\Contracts\StrategyInterface;
+use Armory\Rate\Events\Event;
 use Armory\Rate\Strategies\BasicStrategy;
 use Armory\Rate\Strategies\DynamicStrategy;
 use RuntimeException;
@@ -77,6 +79,8 @@ class Rate implements RateInterface
     public function setRepository(RepositoryInterface $repository)
     {
         $this->repository = $repository;
+
+        return $this;
     }
 
     /**
@@ -139,25 +143,39 @@ class Rate implements RateInterface
     }
 
     /**
-     * Sets the event to handle
-     * @param  EventInterface $event
+     * Set a penalty for getting rate limited in seconds
+     * @param int $penalty
      * @return RateInterface
      */
-    public function handle(EventInterface $event)
+    public function penalty($penalty)
     {
-        $this->event = $event;
+        $this->getStrategy()->setPenalty($penalty);
+
+        return $this;
+    }
+
+    /**
+     * Sets the event to handle
+     * @param string $event
+     * @return RateInterface
+     */
+    public function handle(string $event)
+    {
+        $this->event = new Event($event);
 
         return $this;
     }
 
     /**
      * Handles the event firing as an actor
-     * @param  ActorInterface $actor
+     * @param string $actor
      * @throws RateLimitExceededException
      * @return void
      */
-    public function as(ActorInterface $actor)
+    public function as(string $actor)
     {
+        $actor = new Actor($actor);
+
         $this->getStrategy()->handle($actor, $this->event);
 
         unset($this->event);
@@ -167,8 +185,11 @@ class Rate implements RateInterface
      * Gets the number of remaining attempts available
      * @return int
      */
-    public function remaining(ActorInterface $actor, EventInterface $event)
+    public function remaining(string $actor, string $event)
     {
-        return $this->getStrategy()->getRemaining($actor, $event);
+        return $this->getStrategy()->getRemaining(
+            new Actor($actor),
+            new Event($event)
+        );
     }
 }

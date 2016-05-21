@@ -57,4 +57,17 @@ interface StrategyInterface
      * @return int
      */
     public function getSince($id);
+
+    /**
+     * Set a penalty for getting rate limited in seconds
+     * @param int $penalty
+     * @return void
+     */
+    public function setPenalty($penalty);
+
+    /**
+     * Get the penalty for getting rate limited in seconds
+     * @return void
+     */
+    public function getPenalty();
 }

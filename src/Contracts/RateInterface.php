@@ -64,19 +64,26 @@ interface RateInterface
     public function allow($limit);
 
     /**
-     * Sets the event to handle
-     * @param  EventInterface $event
+     * Set a penalty for getting rate limited in seconds
+     * @param int $penalty
      * @return RateInterface
      */
-    public function handle(EventInterface $event);
+    public function penalty($penalty);
+
+    /**
+     * Sets the event to handle
+     * @param string $event
+     * @return RateInterface
+     */
+    public function handle(string $event);
 
     /**
      * Handles the event firing as an actor
-     * @param  ActorInterface $actor
+     * @param string $actor
      * @throws RateLimitExceededException
      * @return void
      */
-    public function as(ActorInterface $actor);
+    public function as(string $actor);
 
     /**
      * Gets the number of remaining attempts available

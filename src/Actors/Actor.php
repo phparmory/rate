@@ -5,7 +5,7 @@ namespace Armory\Rate\Actors;
 use Armory\Rate\Contracts\ActorInterface;
 use Armory\Rate\Traits\RateLimitActor;
 
-class Guest implements ActorInterface
+class Actor implements ActorInterface
 {
     use RateLimitActor;
 
@@ -14,7 +14,7 @@ class Guest implements ActorInterface
      * @param int $id
      * @return void
      */
-    public function __construct($id)
+    public function __construct($id = null)
     {
         $this->actorId = $id;
     }

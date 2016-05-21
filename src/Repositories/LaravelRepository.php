@@ -66,7 +66,7 @@ class LaravelRepository implements RepositoryInterface
         }
 
         // Update the events
-        $this->cache->put($id, json_encode($existing));
+        $this->cache->forever($id, json_encode($existing));
     }
 
     /**
@@ -93,6 +93,6 @@ class LaravelRepository implements RepositoryInterface
             return $timestamp > $min;
         });
 
-        $this->cache->put($id, json_encode($events));
+        $this->cache->forever($id, json_encode($events));
     }
 }

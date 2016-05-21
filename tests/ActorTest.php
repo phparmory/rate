@@ -2,15 +2,15 @@
 
 namespace Armory\Rate\Tests;
 
-use Armory\Rate\Tests\Stubs\TestActor;
+use Armory\Rate\Actors\Actor;
 use PHPUnit_Framework_TestCase;
 
 class ActorTest extends PHPUnit_Framework_TestCase
 {
     public function testGetIdentifier()
     {
-        $actor = new TestActor;
+        $actor = new Actor(1);
 
-        $this->assertEquals(TestActor::class . ':1', $actor->getActorId());
+        $this->assertEquals(Actor::class . ':1', $actor->getActorId());
     }
 }

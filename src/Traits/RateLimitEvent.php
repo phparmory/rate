@@ -17,13 +17,10 @@ trait RateLimitEvent
     protected $cost = 1;
 
     /**
-     * Creates a new event
-     * @return void
+     * The unique id for this event
+     * @var string
      */
-    function __construct()
-    {
-        $this->timestamp = time();
-    }
+    protected $eventId;
 
     /**
      * Gets the cost of an event
@@ -50,7 +47,7 @@ trait RateLimitEvent
      */
     public function getEventId()
     {
-        return (string) $this->eventId ?: static::class;
+        return static::class . ':' . $this->eventId;
     }
 
     /**
@@ -69,7 +66,7 @@ trait RateLimitEvent
      */
     public function getTimestamp()
     {
-        return (int) $this->timestamp;
+        return isset($this->timestamp) ? $this->timestamp : time();
     }
 
     /**

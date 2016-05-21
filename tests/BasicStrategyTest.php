@@ -5,8 +5,8 @@ namespace Armory\Rate\Tests;
 use Armory\Rate\Exceptions\RateLimitExceededException;
 use Armory\Rate\Repositories\MemoryRepository;
 use Armory\Rate\Strategies\BasicStrategy;
-use Armory\Rate\Tests\Stubs\TestActor;
-use Armory\Rate\Tests\Stubs\TestEvent;
+use Armory\Rate\Actors\Actor;
+use Armory\Rate\Events\Event;
 use PHPUnit_Framework_TestCase;
 
 class BasicStrategyTest extends PHPUnit_Framework_TestCase
@@ -38,8 +38,8 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
 
         $repository = new MemoryRepository;
         $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-        $actor = new TestActor;
+        $event = new Event;
+        $actor = new Actor;
 
         // Set timeframe and allowed attempts
         $strategy->setTimeframe(2);
@@ -55,8 +55,8 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
     {
         $repository = new MemoryRepository;
         $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-        $actor = new TestActor;
+        $event = new Event;
+        $actor = new Actor;
 
         // Set timeframe and allowed attempts
         $strategy->setTimeframe(2);
@@ -78,8 +78,8 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
 
         $repository = new MemoryRepository;
         $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-        $actor = new TestActor;
+        $event = new Event;
+        $actor = new Actor;
 
         // Set the cost to 5
         $event->setCost(5);
@@ -96,8 +96,8 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
     {
         $repository = new MemoryRepository;
         $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-        $actor = new TestActor;
+        $event = new Event;
+        $actor = new Actor;
 
         // Set the cost to 5
         $event->setCost(5);

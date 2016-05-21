@@ -29,6 +29,12 @@ abstract class Strategy implements StrategyInterface
     protected $repository;
 
     /**
+     * The penalty for hitting the rate limit in seconds
+     * @var int
+     */
+    protected $penalty;
+
+    /**
      * Create a new strategy
      * @param RepositoryInterface $repository
      * @return void
@@ -54,6 +60,10 @@ abstract class Strategy implements StrategyInterface
 
          // Check if one more would exceed the limit
         if ($this->repository->count($id) + $event->getCost() > $this->getAllow()) {
+
+            // Penalize the actor for hitting the rate limit
+            $this->penalize($actor, $event);
+
             throw new RateLimitExceededException('Rate limit exceeded');
         }
 
@@ -109,6 +119,44 @@ abstract class Strategy implements StrategyInterface
     public function getTimeframe()
     {
         return (int) $this->timeframe;
+    }
+
+    /**
+     * Set a penalty for getting rate limited in seconds
+     * @param int $penalty
+     * @return void
+     */
+    public function setPenalty($penalty)
+    {
+        $this->penalty = $penalty;
+    }
+
+    /**
+     * Get the penalty for getting rate limited in seconds
+     * @return void
+     */
+    public function getPenalty()
+    {
+        return $this->penalty ?: null;
+    }
+
+    /**
+     * Penalize an actor for a number of seconds
+     * @param ActorInterface $actor
+     * @param EventInterface $event
+     * @return void
+     */
+    protected function penalize(ActorInterface $actor, EventInterface $event)
+    {
+        if (!$this->getPenalty()) {
+            return;
+        }
+
+        $id = $this->generateIdentifier($actor, $event);
+
+        $event->setTimestamp(time() + $this->getPenalty());
+
+        $this->repository->add($id, $event);
     }
 
     /**
