@@ -124,4 +124,25 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
         // This test has to assert that it didn't throw an exception
         $this->assertTrue(true);
     }
+
+    public function testRateLimitFailsWithHighCost()
+    {
+        // We should expect this test to fail
+        $this->setExpectedException(RateLimitExceededException::class);
+
+        $repository = new MemoryRepository;
+        $strategy = new BasicStrategy($repository);
+        $event = new TestEvent;
+        $actor = new TestActor;
+
+        // Set the cost to 5
+        $event->setCost(5);
+
+        // Set timeframe and allowed attempts
+        $strategy->setTimeframe(1);
+        $strategy->setAllow(1);
+
+        // Handle the event twice
+        $strategy->handle($actor, $event);
+    }
 }

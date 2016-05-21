@@ -56,8 +56,11 @@ class MemoryRepository extends Repository
         // Get existing events that have happened
         $existing = $this->find($id);
 
-        // Add the event by timestamp
-        $existing[] = $event->getTimestamp();
+        // Add the event by timestamp a number of times based on
+        // the cost of the event
+        for ($i = 0; $i < $event->getCost(); $i++) {
+            $existing[] = $event->getTimestamp();
+        }
 
         // Update the events
         $this->events[$id] = $existing;
