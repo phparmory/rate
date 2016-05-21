@@ -69,7 +69,7 @@ $strategy->setAllow(1); // 1 request
 $strategy->setTimeframe(1); // every second
 
 $user = new User;
-$request = new RequestApi;
+$request = new RequestsApi;
 
 $strategy->handle($user, $request); // Works
 $strategy->handle($user, $request); // Throws RateLimitExceededException
@@ -82,12 +82,15 @@ Rate comes with a more expressive way of creating rate limiters:
 ```php
 use Armory\Rate\Rate;
 
-// Uses a dynamic strategy and memory repository allowing 2 events within 3 seconds
-$rate = new Rate()->dynamic()->allow(2)->seconds(3);
+$rate = new Rate()
+$event = new RequestsApi;
 
-$rate->handle(new TestEvent)->as($actor);
-$rate->handle(new TestEvent)->as($actor);
-$rate->handle(new TestEvent)->as($actor); // Throws RateLimitExceededException
+// Uses a dynamic strategy and memory repository allowing 2 events within 3 seconds
+$rate->dynamic()->allow(2)->seconds(3);
+
+$rate->handle(new RequestsApi)->as($user);
+$rate->handle(new RequestsApi)->as($user);
+$rate->handle(new RequestsApi)->as($user); // Throws RateLimitExceededException
 ```
 
 ### Costs
