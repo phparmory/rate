@@ -60,21 +60,18 @@ $strategy->handle($actor, $event); // Works
 $strategy->handle($actor, $event); // Throws RateLimitExceededException
 ```
 
-### Convenience
+### Rate limiters
 
-Rate comes with a more convenient way of creating rate limiters:
+Rate comes with a more expressive way of creating rate limiters:
 
 ```php
-use Armory\Rate\Repositories\MemoryRepository;
 use Armory\Rate\Rate;
 
-$rate = new Rate(new MemoryRepository);
-    ->basic()
-    ->seconds(3)
-    ->limit(2);
+// Uses a dynamic strategy and memory repository allowing 2 events within 3 seconds
+$rate = new Rate()->dynamic()->allow(2)->seconds(3);
 
-$rate->fire(new TestEvent)->as($actor);
-$rate->fire(new TestEvent)->as($actor);
-$rate->fire(new TestEvent)->as($actor);
+$rate->handle(new TestEvent)->as($actor);
+$rate->handle(new TestEvent)->as($actor);
+$rate->handle(new TestEvent)->as($actor);
 ```
 

@@ -12,19 +12,20 @@ class DynamicStrategy extends Strategy
 {
     /**
      * Gets the timestamp before which events are counted for rate limiting
-     * @param EventInterface $event
+     * @param string $id
      * @return int
      */
-    public function getBefore(EventInterface $event)
+    public function getBefore($id)
     {
-        return time();
+        return time() + 1;
     }
 
     /**
      * Gets the timestamp after which events are counted for rate limiting
+     * @param string $id
      * @return int
      */
-    public function getAfter(EventInterface $event)
+    public function getAfter($id)
     {
         return time() - $this->getTimeframe();
     }

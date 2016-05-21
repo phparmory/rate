@@ -11,15 +11,16 @@ abstract class Repository implements RepositoryInterface
      * The event to filter by
      * @var EventInterface
      */
-    protected $filter;
+    protected $events;
 
     /**
      * Prepares the repository to filter by event
-     * @return EventInterface $event
+     * @param EventInterface $event
+     * @return RepositoryInterface
      */
-    public function filter(EventInterface $event)
+    public function for(EventInterface $event)
     {
-        $this->filter = $event;
+        $this->event = $event;
 
         return $this;
     }

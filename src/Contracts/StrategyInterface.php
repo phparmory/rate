@@ -20,6 +20,14 @@ interface StrategyInterface
     public function handle(ActorInterface $actor, EventInterface $event);
 
     /**
+     * Gets the remaining attempts for an event
+     * @param ActorInterface $actor
+     * @param EventInterface $event
+     * @return int
+     */
+    public function getRemaining(ActorInterface $actor, EventInterface $event);
+
+    /**
      * Sets the number of events to allow within a timeframe
      * @param int $allow
      */
@@ -45,16 +53,17 @@ interface StrategyInterface
 
     /**
      * Gets the timestamp before which events are counted for rate limiting
-     * @param EventInterface $event
+     * @param string $id
      * @return int
      */
-    public function getBefore(EventInterface $event);
+    public function getBefore($id);
 
     /**
      * Gets the timestamp after which events are counted for rate limiting
+     * @param string $id
      * @return int
      */
-    public function getAfter(EventInterface $event);
+    public function getAfter($id);
 
     /**
      * Gets the timestamp before which events should be garbage collected

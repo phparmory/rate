@@ -20,76 +20,88 @@ class MemoryRepository extends Repository
      */
     public function all()
     {
-        $events = $this->events;
+        return $this->events;
+    }
 
-        if ($this->filter) {
-            $events = $this->events[$this->filter->getIdentifier()] ?? [];
-            sort($events);
-        }
-
+    /**
+     * Finds all events that match
+     * @param string $id
+     * @return array
+     */
+    public function find($id)
+    {
+        $events = $this->events[$id] ?? [];
+        sort($events);
         return $events;
     }
 
     /**
+     * Count the number of matching events
+     * @param string $id
+     * @return int
+     */
+    public function count($id)
+    {
+        return count($this->find($id));
+    }
+
+    /**
      * Adds an event to the repository
+     * @param string $id
      * @param EventInterface $event
      * @return void
      */
-    public function add(EventInterface $event)
+    public function add($id, EventInterface $event)
     {
         // Get existing events that have happened
-        $existing = $this->filter($event)->all();
+        $existing = $this->find($id);
 
         // Add the event by timestamp
         $existing[] = $event->getTimestamp();
 
         // Update the events
-        $this->events[$event->getIdentifier()] = $existing;
+        $this->events[$id] = $existing;
     }
 
     /**
      * Finds the events that happened between a min and max timestamp
-     * @param EventInterface $event
+     * @param string $id
      * @param int $min
      * @param int $max
      * @return array
      */
-    public function between(int $min, int $max)
+    public function between($id, int $min, int $max)
     {
-        return array_filter($this->all(), function($timestamp) use ($min, $max)
+        return array_filter($this->find($id), function($timestamp) use ($min, $max)
         {
-            return $timestamp > $min && $timestamp <= $max;
+            return $timestamp > $min && $timestamp < $max;
         });
     }
 
     /**
      * Finds the timestamp of the first occuring matching event
-     * @param EventInterface $event
+     * @param string $id
      * @return int|null
      */
-    public function first()
+    public function first($id)
     {
-        if (!$this->filter) {
-            return null;
-        }
-
-        $events = $this->all();
+        $events = $this->find($id);
         return reset($events);
     }
 
     /**
      * Remove all events that happen before a min timestamp
-     * @param EventInterface $event
+     * @param string $id
      * @param int $min
      * @return void
      */
-    public function remove(int $min)
+    public function removeBefore($id, int $min)
     {
-        $events = array_filter($this->all(), function($timestamp) use ($min)
+        $events = array_filter($this->find($id), function($timestamp) use ($min)
         {
             return $timestamp > $min;
         });
 
-        $this->events[$this->filter->getIdentifier()] = $events;
+        $this->events[$id] = $events;
     }
 }

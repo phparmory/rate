@@ -22,7 +22,7 @@ abstract class Event implements EventInterface
      * The cost of firing this event
      * @var int
      */
-    protected $cost;
+    protected $cost = 1;
 
     /**
      * Creates a new event
@@ -37,18 +37,28 @@ abstract class Event implements EventInterface
      * Gets the cost of an event
      * @return int
      */
-    public function getCost() : int
+    public function getCost()
     {
         return (int) $this->cost;
+    }
+
+    /**
+     * Sets the cost of an event
+     * @param int $cost
+     * @return void
+     */
+    public function setCost($cost)
+    {
+        $this->cost = $cost;
     }
 
     /**
      * Gets the unique rate identifier of this event
      * @return string
      */
-    public function getIdentifier() : string
+    public function getIdentifier()
     {
-        return (string) $this->id;
+        return (string) $this->id ?: static::class;
     }
 
     /**
@@ -65,8 +75,18 @@ abstract class Event implements EventInterface
      * Gets the timestamp when the event was fired
      * @return int
      */
-    public function getTimestamp() : int
+    public function getTimestamp()
     {
         return (int) $this->timestamp;
+    }
+
+    /**
+     * Sets the timestamp when the event was fired
+     * @param int $timestamp
+     * @return void
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->timestamp = $timestamp;
     }
 }

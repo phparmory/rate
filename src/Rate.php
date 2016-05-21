@@ -4,13 +4,14 @@ namespace Armory\Rate;
 
 use Armory\Rate\Contracts\ActorInterface;
 use Armory\Rate\Contracts\EventInterface;
+use Armory\Rate\Contracts\RateInterface;
 use Armory\Rate\Contracts\RepositoryInterface;
 use Armory\Rate\Contracts\StrategyInterface;
 use Armory\Rate\Strategies\BasicStrategy;
 use Armory\Rate\Strategies\DynamicStrategy;
 use RuntimeException;
 
-class Rate
+class Rate implements RateInterface
 {
     /**
      * The strategy to use for rate limiting
@@ -31,20 +32,25 @@ class Rate
     protected $repository;
 
     /**
-     * Create a new rate limiter
-     * @param RepositoryInterface $repository
+     * Gets the strategy for this rate limiter
+     * @return StrategyInterface
      */
-    function __construct(RepositoryInterface $repository)
+    public function getStrategy()
     {
-        $this->repository = $repository;
+        // Default to a basic strategy
+        if (!$this->strategy) {
+            $this->setStrategy(new BasicStrategy($this->getRepository()));
+        }
+
+        return $this->strategy;
     }
 
     /**
      * Sets the strategy for this rate limiter
      * @param StrategyInterface $strategy
-     * @return void
+     * @return RateInterface
      */
-    public function strategy(StrategyInterface $strategy)
+    public function setStrategy(StrategyInterface $strategy)
     {
         $this->strategy = $strategy;
 
@@ -52,23 +58,34 @@ class Rate
     }
 
     /**
-     * Sets the strategy of this rate limiter to dynamic
-     * @return void
+     * Gets the repository for this rate limiter
+     * @return RepositoryInterface
      */
-    public function dynamic()
+    public function getRepository()
     {
-        $this->strategy(new DynamicStrategy($this->repository));
+        if (!$this->repository) {
+            $this->setRepository(new MemoryRepository);
+        }
 
-        return $this;
+        return $this->repository;
     }
 
     /**
-     * Sets the strategy of this rate limiter to basic
-     * @return void
+     * Sets the repository for this rate limiter
+     * @param RepositoryInterface $repository
      */
-    public function basic()
+    public function setRepository(RepositoryInterface $repository)
     {
-        $this->strategy(new BasicStrategy($this->repository));
+        $this->repository = $repository;
+    }
+
+    /**
+     * Sets the strategy of this rate limiter to dynamic
+     * @return RateInterface
+     */
+    public function dynamic()
+    {
+        $this->setStrategy(new DynamicStrategy($this->getRepository()));
 
         return $this;
     }
@@ -76,15 +93,11 @@ class Rate
     /**
      * Set the timeframe in seconds
      * @param int $seconds
-     * @return Rate
+     * @return RateInterface
      */
     public function seconds($seconds)
     {
-        if (!$this->strategy) {
-            throw new RuntimeException('No strategy has been set for this rate limiter');
-        }
-
-        $this->strategy->setTimeframe($seconds);
+        $this->getStrategy()->setTimeframe($seconds);
 
         return $this;
     }
@@ -92,7 +105,7 @@ class Rate
     /**
      * Set the timeframe in minutes
      * @param int $minutes
-     * @return Rate
+     * @return RateInterface
      */
     public function minutes($minutes)
     {
@@ -104,7 +117,7 @@ class Rate
     /**
      * Set the timeframe in hours
      * @param int $hours
-     * @return Rate
+     * @return RateInterface
      */
     public function hours($hours)
     {
@@ -114,27 +127,23 @@ class Rate
     }
 
     /**
-     * Limit the number of attempts
+     * Limit the number of attempts to allow
      * @param int $limit
-     * @return Rate
+     * @return RateInterface
      */
-    public function limit($limit)
+    public function allow($limit)
     {
-        if (!$this->strategy) {
-            throw new RuntimeException('No strategy has been set for this rate limiter');
-        }
-
-        $this->strategy->setAllow($limit);
+        $this->getStrategy()->setAllow($limit);
 
         return $this;
     }
 
     /**
-     * Sets the event to fire
+     * Sets the event to handle
      * @param  EventInterface $event
-     * @return Rate
+     * @return RateInterface
      */
-    public function fire(EventInterface $event)
+    public function handle(EventInterface $event)
     {
         $this->event = $event;
 
@@ -145,16 +154,21 @@ class Rate
      * Handles the event firing as an actor
      * @param  ActorInterface $actor
      * @throws RateLimitExceededException
-     * @return
+     * @return void
      */
     public function as(ActorInterface $actor)
     {
-        if (!$this->strategy) {
-            throw new RuntimeException('No strategy has been set for this rate limiter');
-        }
-
-        $this->strategy->handle($actor, $this->event);
+        $this->getStrategy()->handle($actor, $this->event);
 
         unset($this->event);
+    }
+
+    /**
+     * Gets the number of remaining attempts available
+     * @return int
+     */
+    public function remaining()
+    {
+        return $this->getStrategy()->getRemaining($this->event);
     }
 }

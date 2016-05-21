@@ -46,19 +46,18 @@ abstract class Strategy implements StrategyInterface
      */
     public function handle(ActorInterface $actor, EventInterface $event)
     {
-        // Set the unique identifier of the event
-        $event->setIdentifier($this->generateIdentifier($actor, $event));
+        // Generate a unique ID based on the actor and event
+        $id = $this->generateIdentifier($actor, $event);
 
         // Add the event to the repository
-        $this->repository->add($event);
+        $this->repository->add($id, $event);
 
         // Get all matching events between two timestamps
-        $events = $this->repository
-            ->filter($event)
-            ->between(
-                $after = $this->getAfter($event),
-                $before = $this->getBefore($event)
-            );
+        $events = $this->repository->between(
+            $id,
+            $after = $this->getAfter($id),
+            $before = $this->getBefore($id)
+        );
 
         // If the rate limit is exceeded then throw an exception
         if (count($events) > $this->getAllow()) {
@@ -66,9 +65,21 @@ abstract class Strategy implements StrategyInterface
         }
 
         // Garbage collect any old events
-        $this->repository
-            ->filter($event)
-            ->remove($this->getTrashBefore($after, $before));
+        $this->repository->removeBefore($id, $this->getTrashBefore($after, $before));
+    }
+
+    /**
+     * Gets the remaining attempts for an event
+     * @param ActorInterface $actor
+     * @param EventInterface $event
+     * @return int
+     */
+    public function getRemaining(ActorInterface $actor, EventInterface $event)
+    {
+        // Generate a unique ID based on the actor and event
+        $id = $this->generateIdentifier($actor, $event);
+
+        return $this->getAllow() - $this->repository->count($id);
     }
 
     /**
