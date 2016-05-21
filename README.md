@@ -96,6 +96,10 @@ If you have multiple events that need rate limiting then one approach would be t
 create new rate limiters for each endpoint like so:
 
 ```php
+use Armory\Rate\Contracts\EventInterface;
+use Armory\Rate\Traits\RateLimitEvent;
+use Rate;
+
 class RequestsUserApi implements EventInterface
 {
     use RateLimitEvent;
@@ -121,6 +125,10 @@ This would allow the user a total of 150 requests per hour, 100 for the user api
 and 50 for the posts api. Another way to handle it is using costs:
 
 ```php
+use Armory\Rate\Contracts\EventInterface;
+use Armory\Rate\Traits\RateLimitEvent;
+use Rate;
+
 class RequestsUserApi implements EventInterface
 {
     use RateLimitEvent;
