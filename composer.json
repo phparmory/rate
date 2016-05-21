@@ -23,6 +23,7 @@
         }
     },
     "suggest": {
-        "predis/predis": "Required to use the Redis repository driver (^1.0).",
+        "predis/predis": "Required to use the Redis repository driver (~1.0).",
+        "illuminate/cache": "Required to use the Laravel repository driver (~5.1.*)"
     }
 }
