@@ -53,7 +53,7 @@ abstract class Strategy implements StrategyInterface
         $this->repository->clear($id, $this->getSince($id));
 
          // Check if one more would exceed the limit
-        if ($this->repository->count($id) + 1 > $this->getAllow()) {
+        if ($this->repository->count($id) + $event->getCost() > $this->getAllow()) {
             throw new RateLimitExceededException('Rate limit exceeded');
         }
 

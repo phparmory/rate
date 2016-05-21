@@ -2,11 +2,14 @@
 
 namespace Armory\Rate\Tests\Stubs;
 
-use Armory\Rate\Events\Event;
+use Armory\Rate\Traits\RateLimitEvent;
+use Armory\Rate\Contracts\EventInterface;
 
-class TestEvent extends Event
+class TestEvent implements EventInterface
 {
-    protected $id = 1;
+    use RateLimitEvent;
+
+    protected $eventId = 1;
 
     protected $cost = 1;
 }

@@ -31,60 +31,6 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(5, $strategy->getTimeframe());
     }
 
-    public function testGetBefore()
-    {
-        $repository = new MemoryRepository;
-        $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-
-        // Set the timeframe in seconds
-        $strategy->setTimeframe(5);
-
-        // Add the event to the repository
-        $repository->add($event->getIdentifier(), $event);
-
-        // Before should be 5 seconds after the first
-        $this->assertEquals(time() + 5, $strategy->getBefore($event->getIdentifier()));
-    }
-
-    public function testGetAfter()
-    {
-        $repository = new MemoryRepository;
-        $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-
-        // Set the timeframe in seconds
-        $strategy->setTimeframe(5);
-
-        // Add the event to the repository
-        $repository->add($event->getIdentifier(), $event);
-
-        // After should be a second before the first event
-        $this->assertEquals($event->getTimestamp() - 1, $strategy->getAfter($event->getIdentifier()));
-    }
-
-    public function testTrashBefore()
-    {
-        $repository = new MemoryRepository;
-        $strategy = new BasicStrategy($repository);
-        $event = new TestEvent;
-
-        // Set the timeframe in seconds
-        $strategy->setTimeframe(5);
-
-        // Add the event to the repository
-        $repository->add($event->getIdentifier(), $event);
-
-        // Trash everything before the first event
-        $this->assertEquals(
-            $event->getTimestamp() - 1,
-            $strategy->getTrashBefore(
-                $strategy->getAfter($event->getIdentifier()),
-                $strategy->getBefore($event->getIdentifier())
-            )
-        );
-    }
-
     public function testRateLimitExceeded()
     {
         // We should expect this test to fail
@@ -144,5 +90,25 @@ class BasicStrategyTest extends PHPUnit_Framework_TestCase
 
         // Handle the event twice
         $strategy->handle($actor, $event);
+    }
+
+    public function testRateLimitRemaining()
+    {
+        $repository = new MemoryRepository;
+        $strategy = new BasicStrategy($repository);
+        $event = new TestEvent;
+        $actor = new TestActor;
+
+        // Set the cost to 5
+        $event->setCost(5);
+
+        // Set timeframe and allowed attempts
+        $strategy->setTimeframe(1);
+        $strategy->setAllow(10);
+
+        // Handle the event twice
+        $strategy->handle($actor, $event);
+
+        $this->assertEquals(5, $strategy->getRemaining($actor, $event));
     }
 }

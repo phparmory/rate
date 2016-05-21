@@ -11,6 +11,6 @@ class ActorTest extends PHPUnit_Framework_TestCase
     {
         $actor = new TestActor;
 
-        $this->assertEquals('1', $actor->getIdentifier());
+        $this->assertEquals(TestActor::class . ':1', $actor->getActorId());
     }
 }

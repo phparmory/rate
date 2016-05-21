@@ -24,20 +24,20 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(100, $event->getCost());
     }
 
-    public function testGetIdentifier()
+    public function testGetEventId()
     {
         $event = new TestEvent;
 
-        $this->assertEquals(1, $event->getIdentifier());
+        $this->assertEquals(1, $event->getEventId());
     }
 
-    public function testSetIdentifier()
+    public function testSetEventId()
     {
         $event = new TestEvent;
 
-        $event->setIdentifier('test.event');
+        $event->setEventId('test.event');
 
-        $this->assertEquals('test.event', $event->getIdentifier());
+        $this->assertEquals('test.event', $event->getEventId());
     }
 
     public function testGetTimestamp()

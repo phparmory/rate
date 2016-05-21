@@ -2,9 +2,12 @@
 
 namespace Armory\Rate\Tests\Stubs;
 
-use Armory\Rate\Actors\Actor;
+use Armory\Rate\Traits\RateLimitActor;
+use Armory\Rate\Contracts\ActorInterface;
 
-class TestActor extends Actor
+class TestActor implements ActorInterface
 {
-    protected $id = 1;
+    use RateLimitActor;
+
+    protected $actorId = 1;
 }

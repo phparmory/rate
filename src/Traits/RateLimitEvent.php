@@ -5,12 +5,6 @@ namespace Armory\Rate\Traits;
 trait RateLimitEvent
 {
     /**
-     * The unique event identifier
-     * @var string
-     */
-    protected $eventId;
-
-    /**
      * The timestamp when the event was fired
      * @var int
      */
