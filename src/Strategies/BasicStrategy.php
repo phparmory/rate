@@ -5,10 +5,10 @@ namespace Armory\Rate\Strategies;
 use Armory\Rate\Contracts\EventInterface;
 
 /**
- * The static strategy specifies a rate limit within a fixed time
+ * The basic strategy specifies a rate limit within a fixed time
  * frame i.e. allow X events every Y minutes.
  */
-class StaticStrategy extends Strategy
+class BasicStrategy extends Strategy
 {
     /**
      * Gets the timestamp before which events are counted for rate limiting
@@ -17,7 +17,7 @@ class StaticStrategy extends Strategy
      */
     public function getBefore(EventInterface $event)
     {
-        return $this->getAfter($event) + $this->getTimeframe();
+        return $this->getAfter($event) + $this->getTimeframe() - 1;
     }
 
     /**
@@ -26,7 +26,7 @@ class StaticStrategy extends Strategy
      */
     public function getAfter(EventInterface $event)
     {
-        return $this->repository->first($event);
+        return $this->repository->first($event) - 1;
     }
 
     /**

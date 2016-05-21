@@ -58,7 +58,7 @@ class MemoryRepository extends Repository
     {
         return array_filter($this->all(), function($timestamp) use ($min, $max)
         {
-            return $timestamp >= $min && $timestamp < $max;
+            return $timestamp > $min && $timestamp <= $max;
         });
     }
 
@@ -87,7 +87,7 @@ class MemoryRepository extends Repository
     {
         $events = array_filter($this->all(), function($timestamp) use ($min)
         {
-            return $timestamp >= $min;
+            return $timestamp > $min;
         });
 
         $this->events[$this->filter->getIdentifier()] = $events;
