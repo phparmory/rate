@@ -3,17 +3,13 @@ Rate limiter implementation
 
 ### Actors
 
-Actors are an abstract class that are able to fire events:
+Actors are the class that can fire events:
 
 ```php
-use Armory\Rate\Contracts\ActorInterface;
-use Armory\Rate\Traits\RateLimitActor;
+use Armory\Rate\Actors\Actor;
 
-class User implements ActorInterface
+class User extends Actor
 {
-    use RateLimitActor;
-
-    protected $actorId = 1;
 }
 ```
 
@@ -22,14 +18,10 @@ class User implements ActorInterface
 Events are classes that can be rate limited:
 
 ```php
-use Armory\Rate\Contracts\EventInterface;
-use Armory\Rate\Traits\RateLimitEvent;
+use Armory\Rate\Events\Event;
 
-class RequestsApi implements EventInterface
+class RequestsApi extends Event
 {
-    use RateLimitEvent;
-
-    protected $eventId = 1;
 }
 ```
 
@@ -52,6 +44,8 @@ $repository->add($id, $request);
 
 echo $repository->count($id); // 1
 ```
+
+Rate comes with a RedisRepository and LaravelRepository as well.
 
 ### Strategies
 
@@ -82,15 +76,15 @@ Rate comes with a more expressive way of creating rate limiters:
 ```php
 use Armory\Rate\Rate;
 
-$rate = new Rate()
-$event = new RequestsApi;
-
 // Uses a dynamic strategy and memory repository allowing 2 events within 3 seconds
-$rate->dynamic()->allow(2)->seconds(3);
+$rate = (new Rate)->dynamic()
+    ->allow(2)
+    ->seconds(3);
 
-$rate->handle(new RequestsApi)->as($user);
-$rate->handle(new RequestsApi)->as($user);
-$rate->handle(new RequestsApi)->as($user); // Throws RateLimitExceededException
+// 'request.api' is the event and '127.0.0.1' is the actor
+$rate->handle('request.api')->as('127.0.0.1');
+$rate->handle('request.api')->as('127.0.0.1');
+$rate->handle('request.api')->as('127.0.0.1'); // Throws RateLimitExceededException
 ```
 
 ### Costs
@@ -103,55 +97,20 @@ use Armory\Rate\Contracts\EventInterface;
 use Armory\Rate\Traits\RateLimitEvent;
 use Rate;
 
-class RequestsUserApi implements EventInterface
-{
-    use RateLimitEvent;
-
-    protected $eventId = 1;
-}
-
-class RequestsPostsApi implements EventInterface
-{
-    use RateLimitEvent;
-
-    protected $eventId = 2;
-}
-
-$userApi = new Rate;
-$userApi->allow(100)->hour(1); // Allow 100 requests to the user api an hour
-
-$postsApi = new Rate;
-$postsApi->allow(50)->hour(1); // Allow 50 requests to the posts api an hour
+$userApi = (new Rate)->allow(100)->hour(1); // Allow 100 requests to the user api an hour
+$postsApi = (new Rate)->allow(50)->hour(1); // Allow 50 requests to the posts api an hour
 ```
 
 This would allow the user a total of 150 requests per hour, 100 for the user api
 and 50 for the posts api. Another way to handle it is using costs:
 
 ```php
-use Armory\Rate\Contracts\EventInterface;
-use Armory\Rate\Traits\RateLimitEvent;
 use Rate;
 
-class RequestsUserApi implements EventInterface
-{
-    use RateLimitEvent;
+$api = (new Rate)->allow(200)->hour(1); // User has 200 api credits per hour
 
-    protected $eventId = 1;
-
-    protected $cost = 1;
-}
-
-class RequestsPostsApi implements EventInterface
-{
-    use RateLimitEvent;
-
-    protected $eventId = 2;
-
-    protected $cost = 2;
-}
-
-$api = new Rate;
-$api->allow(200)->hour(1); // User has 200 api credits per hour
+$rate->handle('request.api.user', 1)->as('127.0.0.1'); // User API requests cost 1
+$rate->handle('request.api.posts', 2)->as('127.0.0.1'); // Posts API requests cost 2
 ```
 
 In this case the user has 200 api credits to use. They could do:
@@ -159,3 +118,17 @@ In this case the user has 200 api credits to use. They could do:
 - 200 requests to the user api or
 - 100 requests to the posts api or
 - 100 requests so the user api and 50 to the posts api
+
+### Penalties
+
+Penalties can be added when excessive rate limiting occurs. An actor will be rate
+limited until the penalty is up.
+
+```php
+use Rate;
+
+$api = (new Rate)->allow(100)->minutes(1)->penalty(60); // Allow 100 requests in 1 minute but penalize for 60 seconds if a rate limit is hit.
+```
+
+Rate limits will stack meaning that if the actor requests again within the minute penalty, an
+additional 60 second penalty will occur.
