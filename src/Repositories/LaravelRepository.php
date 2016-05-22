@@ -81,6 +81,17 @@ class LaravelRepository implements RepositoryInterface
     }
 
     /**
+     * Finds the timestamp of the first occuring matching event
+     * @param string $id
+     * @return int
+     */
+    public function last($id)
+    {
+        $events = array_reverse($this->find($id));
+        return reset($events);
+    }
+
+    /**
      * Clear all events that happen before a min timestamp
      * @param string $id
      * @param int $min

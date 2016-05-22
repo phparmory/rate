@@ -76,6 +76,17 @@ class RedisRepository implements RepositoryInterface
     }
 
     /**
+     * Finds the timestamp of the first occuring matching event
+     * @param string $id
+     * @return int
+     */
+    public function last($id)
+    {
+        $first = array_values($this->redis->zrange($id, -1, -1, 'WITHSCORES'));
+        return reset($first);
+    }
+
+    /**
      * Clear all events that happen before a min timestamp
      * @param string $id
      * @param int $min

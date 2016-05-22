@@ -28,9 +28,16 @@ interface RepositoryInterface
     /**
      * Finds the first occuring matching event
      * @param string $id
-     * @return void
+     * @return int
      */
     public function first($id);
+
+    /**
+     * Finds the last matching event
+     * @param string $id
+     * @return int
+     */
+    public function last($id);
 
     /**
      * Clear all events that happen before a min timestamp

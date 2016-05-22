@@ -60,11 +60,22 @@ class MemoryRepository implements RepositoryInterface
     /**
      * Finds the timestamp of the first occuring matching event
      * @param string $id
-     * @return int|null
+     * @return int
      */
     public function first($id)
     {
         $events = $this->find($id);
+        return reset($events);
+    }
+
+    /**
+     * Finds the timestamp of the first occuring matching event
+     * @param string $id
+     * @return int
+     */
+    public function last($id)
+    {
+        $events = array_reverse($this->find($id));
         return reset($events);
     }
 

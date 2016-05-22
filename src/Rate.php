@@ -157,11 +157,14 @@ class Rate implements RateInterface
     /**
      * Sets the event to handle
      * @param string $event
+     * @param int $cost
      * @return RateInterface
      */
-    public function handle(string $event)
+    public function handle(string $event, $cost = 1)
     {
         $this->event = new Event($event);
+
+        $this->event->setCost($cost);
 
         return $this;
     }
@@ -183,11 +186,27 @@ class Rate implements RateInterface
 
     /**
      * Gets the number of remaining attempts available
+     * @param string $actor
+     * @param string $event
      * @return int
      */
-    public function remaining(string $actor, string $event)
+    public function getRemaining(string $actor, string $event)
     {
         return $this->getStrategy()->getRemaining(
+            new Actor($actor),
+            new Event($event)
+        );
+    }
+
+    /**
+     * Gets the penalty timeout in seconds from now
+     * @param string $actor
+     * @param string $event
+     * @return int
+     */
+    public function getTimeout(string $actor, string $event)
+    {
+        return $this->getStrategy()->getPenaltyTimeout(
             new Actor($actor),
             new Event($event)
         );

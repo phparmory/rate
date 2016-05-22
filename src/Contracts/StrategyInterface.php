@@ -28,6 +28,14 @@ interface StrategyInterface
     public function getRemaining(ActorInterface $actor, EventInterface $event);
 
     /**
+     * Checks if this user is penalized
+     * @param ActorInterface $actor
+     * @param EventInterface $event
+     * @return boolean
+     */
+    public function isPenalized(ActorInterface $actor, EventInterface $event);
+
+    /**
      * Sets the number of events to allow within a timeframe
      * @param int $allow
      */

@@ -73,9 +73,10 @@ interface RateInterface
     /**
      * Sets the event to handle
      * @param string $event
+     * @param int $cost
      * @return RateInterface
      */
-    public function handle(string $event);
+    public function handle(string $event, $cost = 1);
 
     /**
      * Handles the event firing as an actor
@@ -87,7 +88,17 @@ interface RateInterface
 
     /**
      * Gets the number of remaining attempts available
+     * @param string $actor
+     * @param string $event
      * @return int
      */
-    public function remaining(ActorInterface $actor, EventInterface $event);
+    public function getRemaining(string $actor, string $event);
+
+    /**
+     * Gets the penalty timeout in seconds from now
+     * @param string $actor
+     * @param string $event
+     * @return int
+     */
+    public function getTimeout(string $actor, string $event);
 }

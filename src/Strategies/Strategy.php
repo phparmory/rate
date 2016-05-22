@@ -7,6 +7,7 @@ use Armory\Rate\Contracts\EventInterface;
 use Armory\Rate\Contracts\RepositoryInterface;
 use Armory\Rate\Contracts\StrategyInterface;
 use Armory\Rate\Exceptions\RateLimitExceededException;
+use Armory\Rate\Exceptions\RateLimitPenaltyException;
 
 abstract class Strategy implements StrategyInterface
 {
@@ -52,6 +53,14 @@ abstract class Strategy implements StrategyInterface
      */
     public function handle(ActorInterface $actor, EventInterface $event)
     {
+        if ($this->isPenalized($actor, $event)) {
+
+            // Repenalize the actor
+            $this->penalize($actor, $event);
+
+            throw new RateLimitPenaltyException('Rate limit penalty incurred. Please try again later.');
+        }
+
         // Generate a unique ID based on the actor and event
         $id = $this->generateIdentifier($actor, $event);
 
@@ -64,7 +73,7 @@ abstract class Strategy implements StrategyInterface
             // Penalize the actor for hitting the rate limit
             $this->penalize($actor, $event);
 
-            throw new RateLimitExceededException('Rate limit exceeded');
+            throw new RateLimitExceededException('Rate limit has been reached. Please try again later.');
         }
 
         // Add the new event to the repository
@@ -82,7 +91,39 @@ abstract class Strategy implements StrategyInterface
         // Generate a unique ID based on the actor and event
         $id = $this->generateIdentifier($actor, $event);
 
+        if ($this->isPenalized($actor, $event)) {
+            return 0;
+        }
+
         return $this->getAllow() - $this->repository->count($id);
+    }
+
+    /**
+     * Checks if this user is penalized
+     * @param ActorInterface $actor
+     * @param EventInterface $event
+     * @return boolean
+     */
+    public function isPenalized(ActorInterface $actor, EventInterface $event)
+    {
+        // Generate a unique ID based on the actor and event
+        $id = $this->generateIdentifier($actor, $event);
+
+        return $this->repository->last($id) > time();
+    }
+
+    /**
+     * Get the timeout on the penalty in seconds from now
+     * @param ActorInterface $actor
+     * @param EventInterface $event
+     * @return int
+     */
+    public function getPenaltyTimeout(ActorInterface $actor, EventInterface $event)
+    {
+        // Generate a unique ID based on the actor and event
+        $id = $this->generateIdentifier($actor, $event);
+
+        return $this->repository->last($id) - time();
     }
 
     /**
@@ -154,8 +195,16 @@ abstract class Strategy implements StrategyInterface
 
         $id = $this->generateIdentifier($actor, $event);
 
-        $event->setTimestamp(time() + $this->getPenalty());
+        // Get the last event (which could be a penalty)
+        $last = $this->repository->last($id);
 
+        // Clear previous events so we can just store a penalty
+        $this->repository->clear($id, $last);
+
+        // Set the penalty time to be a number of seconds after the last request
+        $event->setTimestamp($last + $this->getPenalty());
+
+        // Add the penalty to the repository
         $this->repository->add($id, $event);
     }
 
