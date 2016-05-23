@@ -1,6 +1,18 @@
 # Rate
 
-A simple but extentable rate limiting package
+A simple but extentable rate limiting package.
+
+## Installation
+
+Install using composer.
+
+```
+composer require armory/rate
+```
+
+Rate requires PHP7 to run.
+
+## Documentation
 
 ### Actors
 
