@@ -16,12 +16,13 @@ final class FakeEventRepository implements EventRepositoryInterface
 {
     /**
      * The events in the repository
-     * @var EventCollection
+     * @var EventCollectionInterface
      */
     private $collection;
 
     /**
      * Create a new repository
+     * @param EventCollectionInterface $collection
      * @return void
      */
     public function __construct(EventCollectionInterface $collection)
@@ -42,6 +43,7 @@ final class FakeEventRepository implements EventRepositoryInterface
     /**
      * Add a new event to the repository
      * @param EventInterface $event
+     * @return void
      */
     public function add(EventInterface $event)
     {
