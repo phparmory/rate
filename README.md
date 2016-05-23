@@ -1,134 +1,113 @@
 # Rate
-Rate limiter implementation
+
+A simple but extentable rate limiting package
 
 ### Actors
 
-Actors are the class that can fire events:
+Actors are the entities that can be rate limited. They are identified by an IP address:
 
 ```php
-use Armory\Rate\Actors\Actor;
+use Armory\Rate\{
+    ActorFactory
+};
 
-class User extends Actor
-{
-}
+$actorFactory = new ActorFactory();
+
+$actor = $actorFactory->create('127.0.0.1');
 ```
 
 ### Events
 
-Events are classes that can be rate limited:
+Events are entities that can be rate limited. Event are identified by name, can have a cost (discussed later) and is triggered by an actor.
 
 ```php
-use Armory\Rate\Events\Event;
+use Armory\Rate\{
+    EventFactory
+};
 
-class RequestsApi extends Event
-{
-}
+$eventFactory = new EventFactory();
+
+$event = $eventFactory->create('request.user.api', 1, $actor); // Cost of 1
 ```
 
-### Repositories
+### Rate Limits
 
-Repositories store collections of events that have been fired. The MemoryRepository
-is a good place to start:
+Rate limits are entities that contain information about the imposed limits. Rate limits can have a number of attempts, a timeframe and a penalty (discussed later).
 
 ```php
-use Armory\Rate\Repositories\MemoryRepository;
+use Armory\Rate\{
+    RateLimitFactory
+};
 
-$repository = new MemoryRepository;
-$user = new User;
-$request = new RequestsApi;
+$rateLimitFactory = new RateLimitFactory();
 
-// Form a unique ID with the actorId and eventId
-$id = $user->getUserId() . ':' . $request->getEventId();
-
-$repository->add($id, $request);
-
-echo $repository->count($id); // 1
+$rateLimit = $rateLimitFactory->create(100, 60, 10); // 100 requests per minute (60 seconds) with a penalty of 10 seconds for hitting the rate limit
 ```
 
-Rate comes with a RedisRepository and LaravelRepository as well.
+### Event Repositories
 
-### Strategies
-
-A strategy determines how rate limiting is performed. The two main strategies are:
-
-- BasicStrategy e.g. 60 requests every hour
-- DynamicStrategy (leaky bucket) e.g. 60 requests within an hour
+Events can be persisted to a storage medium so that rate limits can be imposed across requests. Rate comes with a FakeRepository (in-memory) to get you started.
 
 ```php
-use Armory\Rate\Strategies\BasicStrategy;
-use Armory\Rate\Repositories\MemoryRepository;
+use Armory\Rate\{
+    EventRepositoryFactory
+};
 
-$strategy = new BasicStrategy(new MemoryRepository);
-$strategy->setAllow(1); // 1 request
-$strategy->setTimeframe(1); // every second
+$eventRepositoryFactory = new EventRepositoryFactory();
 
-$user = new User;
-$request = new RequestsApi;
-
-$strategy->handle($user, $request); // Works
-$strategy->handle($user, $request); // Throws RateLimitExceededException
+$repository = $eventRepositoryFactory->create(); // Defaults to FakeRepository
 ```
 
-### Rate limiters
+### Rate Limiters
 
-Rate comes with a more expressive way of creating rate limiters:
+Rate limiters are entities that define a strategy for rate limiting. Rate comes with two main rate limiting strategies:
+
+- Basic rate limiting e.g. 100 requests every hour
+- Dynamic rate limiting i.e. leaky bucket
 
 ```php
-use Armory\Rate\Rate;
+use Armory\Rate\{
+    RateLimiterFactory
+};
 
-// Uses a dynamic strategy and memory repository allowing 2 events within 3 seconds
-$rate = (new Rate)->dynamic()
-    ->allow(2)
-    ->seconds(3);
+$rateLimiterFactory = new RateLimiterFactory();
 
-// 'request.api' is the event and '127.0.0.1' is the actor
-$rate->handle('request.api')->as('127.0.0.1');
-$rate->handle('request.api')->as('127.0.0.1');
-$rate->handle('request.api')->as('127.0.0.1'); // Throws RateLimitExceededException
+$rateLimiter = $rateLimiterFactory->dynamic($event, $limit, $repository);
+
+$rateLimiter->run();
 ```
+
+If a rate limited is exceeded it will throw a `Armory\Rate\Exceptions\RateLimitExceededException`.
 
 ### Costs
 
-If you have multiple events that need rate limiting then one approach would be to
-create new rate limiters for each endpoint like so:
+Costs allow for a cost/balance implementation whereby imposing a limit of 100 on the rate limiter
+gives the actor a balance of 100 credits. Each event 'costs' a number of credits which subtract
+from the total balance. For example:
 
 ```php
-use Armory\Rate\Contracts\EventInterface;
-use Armory\Rate\Traits\RateLimitEvent;
-use Rate;
+use Armory\Rate\{
+    EventFactory;
+};
 
-$userApi = (new Rate)->allow(100)->hour(1); // Allow 100 requests to the user api an hour
-$postsApi = (new Rate)->allow(50)->hour(1); // Allow 50 requests to the posts api an hour
+$eventFactory = new EventFactory;
+
+$userApi = $eventFactory->create('user.api', 1, 0); // 1 credit
+$postsApi = $eventFactory->create('posts.api', 2, 0); // 2 credits
 ```
-
-This would allow the user a total of 150 requests per hour, 100 for the user api
-and 50 for the posts api. Another way to handle it is using costs:
-
-```php
-use Rate;
-
-$api = (new Rate)->allow(200)->hour(1); // User has 200 api credits per hour
-
-$rate->handle('request.api.user', 1)->as('127.0.0.1'); // User API requests cost 1
-$rate->handle('request.api.posts', 2)->as('127.0.0.1'); // Posts API requests cost 2
-```
-
-In this case the user has 200 api credits to use. They could do:
-
-- 200 requests to the user api or
-- 100 requests to the posts api or
-- 100 requests so the user api and 50 to the posts api
 
 ### Penalties
 
-Penalties can be added when excessive rate limiting occurs. An actor will be rate
-limited until the penalty is up.
+A third parameter to creating an event allows you to specify a penalty for hitting the rate limit.
+If a rate limit is hit, the penalty time prevents the rate limit from passing even if the
+actor would usually have credits.
 
 ```php
-use Rate;
+use Armory\Rate\{
+    EventFactory
+};
 
-$api = (new Rate)->allow(100)->minutes(1)->penalty(60); // Allow 100 requests in 1 minute but penalize for 60 seconds if a rate limit is hit.
+$eventFactory = new EventFactory;
+
+$userApi = $eventFactory->create('user.api', 1, 20); // Hitting the rate limit puts the actor in timeout for 20 seconds
 ```
-
-Rate limits will stack meaning that if the actor requests again within the minute penalty, an
-additional 60 second penalty will occur.

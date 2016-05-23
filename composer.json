@@ -25,5 +25,9 @@
     "suggest": {
         "predis/predis": "Required to use the Redis repository driver (~1.0).",
         "illuminate/cache": "Required to use the Laravel repository driver (~5.1.*)"
+    },
+    "require": {
+        "beberlei/assert": "^2.5",
+        "ramsey/uuid": "^2.9"
     }
 }

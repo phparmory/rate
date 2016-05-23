@@ -2,11 +2,15 @@
 
 namespace Armory\Rate\Contracts;
 
+use Armory\Rate\{
+    Types\IpAddress
+};
+
 interface ActorInterface
 {
     /**
-     * Returns the unique identifier for this actor
-     * @return string
+     * Get the IP address of this actor
+     * @return IpAddress
      */
-    public function getActorId();
+    public function getIp() : IpAddress;
 }

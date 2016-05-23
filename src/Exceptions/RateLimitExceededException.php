@@ -2,8 +2,9 @@
 
 namespace Armory\Rate\Exceptions;
 
-use RuntimeException;
+use RunTimeException;
 
-class RateLimitExceededException extends RuntimeException
+class RateLimitExceededException extends RunTimeException
 {
+
 }
