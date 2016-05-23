@@ -49,6 +49,15 @@ class NullEvent implements EventInterface
     }
 
     /**
+     * Checks if this event is equal to another
+     * @return Boolean
+     */
+    public function equal(Event $event) : Boolean
+    {
+        return new Boolean(false);
+    }
+
+    /**
      * Calculates the time between this event and a timestamp
      * @param  Timestamp $timestamp
      * @return Integer
@@ -56,5 +65,14 @@ class NullEvent implements EventInterface
     public function timeBetween(Timestamp $timestamp) : Integer
     {
         return new Integer(0);
+    }
+
+    /**
+     * Gets the ID of this event
+     * @return String
+     */
+    public function getId() : StringLiteral
+    {
+        return new StringLiteral('');
     }
 }

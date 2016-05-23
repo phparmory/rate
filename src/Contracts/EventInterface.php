@@ -36,9 +36,21 @@ interface EventInterface
     public function getActor() : ActorInterface;
 
     /**
+     * Checks if this event is equal to another
+     * @return Boolean
+     */
+    public function equal(Event $event) : Boolean;
+
+    /**
      * Calculates the time between this event and a timestamp
      * @param  Timestamp $timestamp
      * @return Integer
      */
     public function timeBetween(Timestamp $timestamp) : Integer;
+
+    /**
+     * Gets the ID of this event
+     * @return String
+     */
+    public function getId() : StringLiteral;
 }
