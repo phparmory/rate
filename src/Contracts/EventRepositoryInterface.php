@@ -26,16 +26,16 @@ interface EventRepositoryInterface
     /**
      * Get the last occurance of an event
      * @param  EventInterface  $event
-     * @return EventInterface|null
+     * @return EventInterface
      */
-    public function last(EventInterface $event);
+    public function last(EventInterface $event) : EventInterface;
 
     /**
      * Get the first occurance of an event
      * @param  EventInterface  $event
-     * @return EventInterface|null
+     * @return EventInterface
      */
-    public function first(EventInterface $event);
+    public function first(EventInterface $event) : EventInterface;
 
     /**
      * Count how many occurances there are of an event

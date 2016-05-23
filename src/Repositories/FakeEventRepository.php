@@ -54,9 +54,9 @@ final class FakeEventRepository implements EventRepositoryInterface
     /**
      * Get the last occurance of an event
      * @param  EventInterface  $event
-     * @return EventInterface|null
+     * @return EventInterface
      */
-    public function last(EventInterface $event)
+    public function last(EventInterface $event) : EventInterface
     {
         return $this->all($event)->last();
     }
@@ -64,9 +64,9 @@ final class FakeEventRepository implements EventRepositoryInterface
     /**
      * Get the first occurance of an event
      * @param  EventInterface  $event
-     * @return EventInterface|null
+     * @return EventInterface
      */
-    public function first(EventInterface $event)
+    public function first(EventInterface $event) : EventInterface
     {
         return $this->all($event)->first();
     }
