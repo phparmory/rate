@@ -72,7 +72,7 @@ $repository = $eventRepositoryFactory->create(); // Defaults to FakeRepository
 
 ### Rate Limiters
 
-Rate limiters are entities that define a strategy for rate limiting. Rate comes with two main rate limiting strategies:
+Rate limiters are services that define a strategy for rate limiting. Rate comes with two main rate limiting strategies:
 
 - Basic rate limiting e.g. 100 requests every hour
 - Dynamic rate limiting i.e. leaky bucket
