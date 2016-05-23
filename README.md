@@ -7,7 +7,7 @@ A simple but extentable rate limiting package.
 Install using composer.
 
 ```
-composer require armory/rate
+composer require phparmory/rate
 ```
 
 Rate requires PHP7 to run.
