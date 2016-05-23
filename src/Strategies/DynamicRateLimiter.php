@@ -20,6 +20,6 @@ class DynamicRateLimiter extends RateLimiter implements RateLimiterInterface
      */
     public function getSince() : Timestamp
     {
-        return new Timestamp(time() - $this->limit->getTimeframe()->toNative());
+        return new Timestamp(time() - $this->limit->getTimeframe()->toInt());
     }
 }
