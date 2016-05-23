@@ -23,11 +23,6 @@ class BasicRateLimiter extends RateLimiter implements RateLimiterInterface
         // Get the first occuring matching event
         $first = $this->repository->first($this->event);
 
-        // If there are no events then just use the current time
-        if (!$first) {
-            return new Timestamp(time());
-        }
-
         // Get the minimum and max timestamps
         $min = $first->getTimestamp()->toInt() - 1;
         $max = $min + $this->limit->getTimeframe()->toInt() + 1;
