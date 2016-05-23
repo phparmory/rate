@@ -8,6 +8,7 @@ use Armory\Rate\{
     Contracts\EventCollectionInterface,
     Contracts\EventInterface,
     Contracts\TypeInterface,
+    Contracts\IntegerInterface,
     NullEvent,
     Types\Integer,
     Types\Timestamp
@@ -32,9 +33,9 @@ final class EventCollection extends Type implements TypeInterface, EventCollecti
 
     /**
      * Returns the number of events in the collection
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function count() : Integer
+    public function count() : IntegerInterface
     {
         return new Integer($this->value->count());
     }
@@ -55,7 +56,7 @@ final class EventCollection extends Type implements TypeInterface, EventCollecti
     /**
      * Get all events after a timestamp
      * @param Timestamp $timestamp
-     * @return Boolean
+     * @return EventCollection
      */
     public function after(Timestamp $timestamp) : EventCollection
     {
@@ -67,18 +68,18 @@ final class EventCollection extends Type implements TypeInterface, EventCollecti
 
     /**
      * Get the first event in the collection
-     * @return Event|null
+     * @return EventInterface
      */
-    public function first()
+    public function first() : EventInterface
     {
         return $this->collection[0] ?? new NullEvent;
     }
 
     /**
      * Get the last event in the collection
-     * @return Event|null
+     * @return EventInterface
      */
-    public function last()
+    public function last() : EventInterface
     {
         $last = $this->value->count() - 1;
 

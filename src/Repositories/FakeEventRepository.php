@@ -7,6 +7,7 @@ use Armory\Rate\{
     Contracts\EventInterface,
     Contracts\EventRepositoryInterface,
     Types\EventCollection,
+    Contracts\IntegerInterface,
     Types\Integer,
     Types\Timestamp
 };
@@ -74,9 +75,9 @@ final class FakeEventRepository implements EventRepositoryInterface
     /**
      * Count how many occurances there are of an event
      * @param  EventInterface   $event
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function count(EventInterface $event) : Integer
+    public function count(EventInterface $event) : IntegerInterface
     {
         return $this->all($event)->count();
     }

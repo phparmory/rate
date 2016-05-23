@@ -18,7 +18,7 @@ class DynamicRateLimiter extends RateLimiter implements RateLimiterInterface
      * Gets the timestamp after which events should be considered for rate limiting
      * @return int
      */
-    public function getSince() : Timestamp
+    protected function getSince() : Timestamp
     {
         return new Timestamp(time() - $this->limit->getTimeframe()->toInt());
     }

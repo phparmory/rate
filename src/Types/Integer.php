@@ -5,10 +5,11 @@ namespace Armory\Rate\Types;
 use Assert\Assertion;
 use Armory\Rate\{
     Contracts\TypeInterface,
+    Contracts\IntegerInterface,
     Types\Boolean
 };
 
-class Integer extends Type implements TypeInterface
+class Integer extends Type implements TypeInterface, IntegerInterface
 {
     /**
      * Create a new value object

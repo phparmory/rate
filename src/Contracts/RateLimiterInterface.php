@@ -4,7 +4,7 @@ namespace Armory\Rate\Contracts;
 
 use Armory\Rate\{
     Types\Boolean,
-    Types\Integer
+    Contracts\IntegerInterface
 };
 
 interface RateLimiterInterface
@@ -17,9 +17,9 @@ interface RateLimiterInterface
 
     /**
      * Get the number of remaining
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getRemaining() : Integer;
+    public function getRemaining() : IntegerInterface;
 
     /**
      * Checks if the actor has been penalized
@@ -29,7 +29,7 @@ interface RateLimiterInterface
 
     /**
      * Get the timeout for an imposed penalty
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getTimeout() : Integer;
+    public function getTimeout() : IntegerInterface;
 }

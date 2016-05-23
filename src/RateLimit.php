@@ -4,37 +4,37 @@ namespace Armory\Rate;
 
 use Armory\Rate\{
     Contracts\RateLimitInterface,
-    Types\Integer
+    Contracts\IntegerInterface
 };
 
 final class RateLimit implements RateLimitInterface
 {
     /**
      * The number of allowed attempts for this rate limit
-     * @var Integer $limit
+     * @var IntegerInterface $limit
      */
     private $limit;
 
     /**
      * The timeframe for this rate limit in seconds
-     * @var Integer
+     * @var IntegerInterface
      */
     private $timeframe;
 
     /**
      * The penalty for hitting the limit
-     * @var Integer
+     * @var IntegerInterface
      */
     private $penalty;
 
     /**
      * Create a new rate limit
-     * @param Integer $limit
-     * @param Integer $timeframe
-     * @param Integer $penalty
+     * @param IntegerInterface $limit
+     * @param IntegerInterface $timeframe
+     * @param IntegerInterface $penalty
      * @return void
      */
-    public function __construct(Integer $limit, Integer $timeframe, Integer $penalty)
+    public function __construct(IntegerInterface $limit, IntegerInterface $timeframe, IntegerInterface $penalty)
     {
         $this->limit = $limit;
         $this->timeframe = $timeframe;
@@ -43,27 +43,27 @@ final class RateLimit implements RateLimitInterface
 
     /**
      * Get the number of allowed attempts for this rate limit
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getLimit() : Integer
+    public function getLimit() : IntegerInterface
     {
         return $this->limit;
     }
 
     /**
      * Get the timeframe for this rate limit
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getTimeframe() : Integer
+    public function getTimeframe() : IntegerInterface
     {
         return $this->timeframe;
     }
 
     /**
      * Get the penalty for hitting the limit
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getPenalty() : Integer
+    public function getPenalty() : IntegerInterface
     {
         return $this->penalty;
     }

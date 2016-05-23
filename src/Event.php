@@ -7,6 +7,7 @@ use Armory\Rate\{
     Contracts\EventInterface,
     Types\Boolean,
     Types\Integer,
+    Contracts\IntegerInterface,
     Types\StringLiteral,
     Types\Timestamp
 };
@@ -21,7 +22,7 @@ final class Event implements EventInterface
 
     /**
      * The cost of this event
-     * @var Integer
+     * @var IntegerInterface
      */
     private $cost;
 
@@ -40,14 +41,14 @@ final class Event implements EventInterface
     /**
      * Create a new event entity
      * @param StringLiteral     $name
-     * @param Integer           $cost
+     * @param IntegerInterface  $cost
      * @param Timestamp         $timestamp
      * @param ActorInterface    $actor
      * @return void
      */
     public function __construct(
         StringLiteral $name,
-        Integer $cost,
+        IntegerInterface $cost,
         Timestamp $timestamp,
         ActorInterface $actor)
     {
@@ -68,9 +69,9 @@ final class Event implements EventInterface
 
     /**
      * Get the cost of this event
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getCost() : Integer
+    public function getCost() : IntegerInterface
     {
         return $this->cost;
     }
@@ -95,9 +96,10 @@ final class Event implements EventInterface
 
     /**
      * Checks if this event is equal to another
+     * @param EventInterface $event
      * @return Boolean
      */
-    public function equal(Event $event) : Boolean
+    public function equal(EventInterface $event) : Boolean
     {
         return new Boolean($this->getId() === $event->getId());
     }
@@ -105,9 +107,9 @@ final class Event implements EventInterface
     /**
      * Calculates the time between this event and a timestamp
      * @param  Timestamp $timestamp
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function timeBetween(Timestamp $timestamp) : Integer
+    public function timeBetween(Timestamp $timestamp) : IntegerInterface
     {
         return new Integer($this->getTimestamp()->toInt() - $timestamp->toInt());
     }

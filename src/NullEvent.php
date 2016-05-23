@@ -5,9 +5,11 @@ namespace Armory\Rate;
 use Armory\Rate\{
     Contracts\ActorInterface,
     Contracts\EventInterface,
+    Contracts\IntegerInterface,
     Types\Integer,
     Types\StringLiteral,
-    Types\Timestamp
+    Types\Timestamp,
+    Types\Boolean
 };
 
 class NullEvent implements EventInterface
@@ -23,9 +25,9 @@ class NullEvent implements EventInterface
 
     /**
      * Get the cost of this event
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getCost() : Integer
+    public function getCost() : IntegerInterface
     {
         return new Integer(0);
     }
@@ -50,9 +52,10 @@ class NullEvent implements EventInterface
 
     /**
      * Checks if this event is equal to another
+     * @param EventInterface $event
      * @return Boolean
      */
-    public function equal(Event $event) : Boolean
+    public function equal(EventInterface $event) : Boolean
     {
         return new Boolean(false);
     }
@@ -60,9 +63,9 @@ class NullEvent implements EventInterface
     /**
      * Calculates the time between this event and a timestamp
      * @param  Timestamp $timestamp
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function timeBetween(Timestamp $timestamp) : Integer
+    public function timeBetween(Timestamp $timestamp) : IntegerInterface
     {
         return new Integer(0);
     }

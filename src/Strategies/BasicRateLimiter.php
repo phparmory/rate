@@ -18,7 +18,7 @@ class BasicRateLimiter extends RateLimiter implements RateLimiterInterface
      * Gets the timestamp after which events should be considered for rate limiting
      * @return Timestamp
      */
-    public function getSince() : Timestamp
+    protected function getSince() : Timestamp
     {
         // Get the first occuring matching event
         $first = $this->repository->first($this->event);

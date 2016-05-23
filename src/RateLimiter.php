@@ -12,6 +12,7 @@ use Armory\Rate\{
     Exceptions\RateLimitExceededException,
     Types\Boolean,
     Types\Integer,
+    Contracts\IntegerInterface,
     Types\Timestamp
 };
 
@@ -76,9 +77,9 @@ abstract class RateLimiter implements RateLimiterInterface
 
     /**
      * Get the number of remaining attempts
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getRemaining() : Integer
+    public function getRemaining() : IntegerInterface
     {
         $count = $this->repository->count($this->event);
 
@@ -104,9 +105,9 @@ abstract class RateLimiter implements RateLimiterInterface
 
     /**
      * Get the timeout for an imposed penalty
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getTimeout() : Integer
+    public function getTimeout() : IntegerInterface
     {
         $last = $this->repository->last($this->event);
 

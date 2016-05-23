@@ -5,7 +5,8 @@ namespace Armory\Rate\Contracts;
 use Armory\Rate\{
     Contracts\EventCollectionInterface,
     Contracts\EventInterface,
-    Types\Integer
+    Contracts\IntegerInterface,
+    Types\Timestamp
 };
 
 interface EventRepositoryInterface
@@ -40,7 +41,15 @@ interface EventRepositoryInterface
     /**
      * Count how many occurances there are of an event
      * @param  EventInterface   $event
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function count(EventInterface $event) : Integer;
+    public function count(EventInterface $event) : IntegerInterface;
+
+    /**
+     * Cleans the repository of all events before a timestamp
+     * @param EventInterface $event
+     * @param Timestamp $timestamp
+     * @return void
+     */
+    public function cleanse(EventInterface $event, Timestamp $timestamp);
 }

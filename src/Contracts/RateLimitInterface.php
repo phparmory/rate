@@ -3,26 +3,26 @@
 namespace Armory\Rate\Contracts;
 
 use Armory\Rate\{
-    Types\Integer
+    Contracts\IntegerInterface
 };
 
 interface RateLimitInterface
 {
     /**
      * Get the number of allowed attempts for this rate limit
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getLimit() : Integer;
+    public function getLimit() : IntegerInterface;
 
     /**
      * Get the timeframe for this rate limit
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getTimeframe() : Integer;
+    public function getTimeframe() : IntegerInterface;
 
     /**
      * Get the penalty for hitting the limit
-     * @return Integer
+     * @return IntegerInterface
      */
-    public function getPenalty() : Integer;
+    public function getPenalty() : IntegerInterface;
 }
